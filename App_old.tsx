@@ -5,31 +5,30 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import { Login } from "./components/Login";
 import { Register } from "./components/Register";
-import { MainApp } from "./components/MainApp";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
+    // <View>
+    //   {/* <Text className="text-red-500">Styling just works! 🎉</Text> */}
 
+    //   <Login />
+    // </View>
     <NavigationContainer>
       <Stack.Navigator>
-      <Stack.Screen
+        <Stack.Screen
           name="Login"
           component={Login}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="Register"
           component={Register}
-          options={{ headerShown: false }}
+          options={{
+            title: "ลงทะเบียน",
+          }}
         />
-         <Stack.Screen
-          name="MainApp"
-          component={MainApp}
-          options={{ headerShown: false }}
-        />
- 
       </Stack.Navigator>
     </NavigationContainer>
   );
