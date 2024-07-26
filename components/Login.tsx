@@ -6,6 +6,7 @@ import {
   TextInput,
   Pressable,
   ScrollView,
+  Alert,
 } from "react-native";
 import { z } from "zod";
 import {
@@ -16,8 +17,10 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useDispatch } from "react-redux"; //call function
 
 import { MyTextInput } from "./ui/MyTextInput";
+import { setInfo } from "../app/user-slice";
 
 const LoginSchema = z.object({
   userCode: z
@@ -33,6 +36,8 @@ type LoginModel = z.infer<typeof LoginSchema>;
 
 export const Login: FC = () => {
   //begin hooks
+  const dispatch = useDispatch();
+
   const navigator = useNavigation<NavigationProp<any>>();
 
   const { control, handleSubmit, reset } = useForm<LoginModel>({
@@ -45,11 +50,39 @@ export const Login: FC = () => {
   //end hooks
 
   //begin function
-  const validatePass: SubmitHandler<LoginModel> = (login) => {
+  const validatePass: SubmitHandler<LoginModel> = async (login) => {
     //when valid pass
     //TODO: send login data to api
-    console.log(login);
-    navigator.navigate("MainApp");
+
+    try {
+      const resp = await fetch("http://13.212.82.218/login", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(login),
+      });
+
+      console.log(login);
+
+      const respJSON = await resp.json();
+
+      if (respJSON.success) {
+        const { firstName, lastName, token, age } = respJSON;
+        dispatch(
+          setInfo({
+            firstName,
+            lastName,
+            age,
+            token,
+          })
+        );
+
+        navigator.navigate("MainApp");
+      } else {
+        Alert.alert("แจ้งเตือน", respJSON.message);
+      }
+    } catch (error) {
+      Alert.alert("มีปัญหา", "กรุณาลองอีกครั้ง");
+    }
   };
 
   const validateFail: SubmitErrorHandler<LoginModel> = (error) => {

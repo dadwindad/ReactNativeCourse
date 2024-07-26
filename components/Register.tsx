@@ -51,15 +51,33 @@ export const Register: FC = () => {
   //end hook
 
   //begin function
-  const validatePass: SubmitHandler<RegisterModel> = (register) => {
+  const validatePass: SubmitHandler<RegisterModel> = async (register) => {
     //TODO:send data to api
     //notify to user
-    Alert.alert("ลงทะเบียนสำเร็จ", "กรุณาตรวจสอบอีเมล์ !!", [
-      { text: "OK", onPress: () => navigator.goBack() },
-    ]);
-    //back to Login screen
 
-    console.log(register);
+    //check server
+    try {
+      const resp = await fetch("http://13.212.82.218/register", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(register),
+      });
+
+      const jsonResp = await resp.json();
+
+      if (jsonResp.success) {
+        Alert.alert("ลงทะเบียนสำเร็จ", "กรุณาตรวจสอบอีเมล์ !!", [
+          { text: "OK", onPress: () => navigator.goBack() },
+        ]);
+        //back to Login screen
+
+        console.log(register);
+      } else {
+        Alert.alert("แจ้งเตือน", jsonResp.message);
+      }
+    } catch (e) {
+      Alert.alert("พบปัญหา", "กรุณาลองใหม่");
+    }
   };
 
   const validateFail: SubmitErrorHandler<RegisterModel> = (register) => {
